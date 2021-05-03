@@ -20,8 +20,38 @@ Servo myservo;
 ESP8266WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
-void move_forward(){
-  
+void move_forward() {
+  Serial.printf("mae ni susumu\n");
+  digitalWrite(RIGHTMOTER1PIN, HIGH);
+  digitalWrite(LEFTMOTER1PIN, HIGH);
+  digitalWrite(MOTER2PIN, LOW);
+}
+
+void move_backward() {
+  Serial.printf("ushiro ni susumu\n");
+  digitalWrite(RIGHTMOTER1PIN, LOW);
+  digitalWrite(LEFTMOTER1PIN, LOW);
+  digitalWrite(MOTER2PIN, HIGH);
+}
+
+void turn_right() {
+  Serial.printf("migi ni mawaru\n");
+  digitalWrite(RIGHTMOTER1PIN, HIGH);
+  digitalWrite(LEFTMOTER1PIN, LOW);
+  digitalWrite(MOTER2PIN, LOW);
+}
+
+void turn_left() {
+  Serial.printf("hidari ni mawaru\n");
+  digitalWrite(RIGHTMOTER1PIN, LOW);
+  digitalWrite(LEFTMOTER1PIN, HIGH);
+  digitalWrite(MOTER2PIN, LOW);
+}
+void wheel_stop() {
+  Serial.printf("tomaru\n");
+  digitalWrite(RIGHTMOTER1PIN, HIGH);
+  digitalWrite(LEFTMOTER1PIN, HIGH);
+  digitalWrite(MOTER2PIN, HIGH);
 }
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
@@ -39,11 +69,11 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       }
       break;
     case WStype_TEXT:
-      if (strcmp((const char*)payload, "move-forward") == 0) Serial.printf("mae ni susumu");
-      else if (strcmp((const char*)payload, "move-backward") == 0) Serial.printf("ushiro ni susumu");
-      else if (strcmp((const char*)payload, "turn-right") == 0) Serial.printf("migi ni mawaru");
-      else if (strcmp((const char*)payload, "turn-left") == 0) Serial.printf("hidari ni mawaru");
-      else if (strcmp((const char*)payload, "stop") == 0) Serial.printf("tomaru");
+      if (strcmp((const char*)payload, "move-forward") == 0) move_forward();
+      else if (strcmp((const char*)payload, "move-backward") == 0) move_backward();
+      else if (strcmp((const char*)payload, "turn-right") == 0) turn_right();
+      else if (strcmp((const char*)payload, "turn-left") == 0) turn_left();
+      else if (strcmp((const char*)payload, "stop") == 0) wheel_stop();
       else Serial.printf("[%u] get Text: %s\n", num, payload);
       break;
   }
@@ -123,6 +153,12 @@ void setup() {
   myservo.write(0);
   pinMode(ECHOPIN, INPUT);
   pinMode(TRIGPIN, OUTPUT);
+  pinMode(RIGHTMOTER1PIN, OUTPUT);
+  pinMode(LEFTMOTER1PIN, OUTPUT);
+  pinMode(MOTER2PIN, OUTPUT);
+  digitalWrite(RIGHTMOTER1PIN, HIGH);
+  digitalWrite(LEFTMOTER1PIN, HIGH);
+  digitalWrite(MOTER2PIN, HIGH);
   delay(1000);
 }
 
