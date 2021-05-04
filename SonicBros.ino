@@ -9,12 +9,12 @@
 #include <Servo.h>
 #include "MYSSID.h"
 #include "index_html.h"
-#define SRVPIN 16
-#define ECHOPIN 5
-#define TRIGPIN 4
-#define RIGHTMOTER1PIN 14
-#define LEFTMOTER1PIN 12
-#define MOTER2PIN 13
+#define SRVPIN 14
+#define ECHOPIN 12
+#define TRIGPIN 13
+#define RIGHTMOTER1PIN 16
+#define LEFTMOTER1PIN 5
+#define MOTER2PIN 4
 
 Servo myservo;
 ESP8266WebServer server(80);
@@ -36,15 +36,15 @@ void move_backward() {
 
 void turn_right() {
   Serial.printf("migi ni mawaru\n");
-  digitalWrite(RIGHTMOTER1PIN, HIGH);
-  digitalWrite(LEFTMOTER1PIN, LOW);
+  digitalWrite(RIGHTMOTER1PIN, LOW);
+  digitalWrite(LEFTMOTER1PIN, HIGH);
   digitalWrite(MOTER2PIN, LOW);
 }
 
 void turn_left() {
   Serial.printf("hidari ni mawaru\n");
-  digitalWrite(RIGHTMOTER1PIN, LOW);
-  digitalWrite(LEFTMOTER1PIN, HIGH);
+  digitalWrite(RIGHTMOTER1PIN, HIGH);
+  digitalWrite(LEFTMOTER1PIN, LOW);
   digitalWrite(MOTER2PIN, LOW);
 }
 void wheel_stop() {
@@ -166,14 +166,14 @@ unsigned long last_10sec = 0;
 unsigned int counter = 0;
 int deg = 0;
 int sign = 1;
-int inc = 5;
+int inc = 10;
 
 void loop() {
   unsigned long t = millis();
   webSocket.loop();
   server.handleClient();
   myservo.write(deg);
-  delay(20);
+  delay(80);
   int dist = measure_distance();
 
   JSONVar json_obj;
@@ -182,10 +182,10 @@ void loop() {
   String json_str = JSON.stringify(json_obj);
   webSocket.broadcastTXT((const char *)json_str.c_str());
   //Serial.println(json_obj);
-  //    delay(50);
+//  delay(20);
 
-  if (deg >= 180) sign = -1;
-  else if (deg <= 0) sign = 1;
+  if (deg + inc > 180) sign = -1;
+  else if (deg - inc < 0) sign = 1;
   deg += sign * inc;
 
   if ((t - last_10sec) > 10 * 1000) {
